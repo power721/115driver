@@ -359,8 +359,8 @@ type ShareSnapResp struct {
 			ReceiveCount     StringInt64 `json:"receive_count"`
 			ExpireTime       int64       `json:"expire_time"`
 			FileCategory     int64       `json:"file_category"`
-			AutoRenewal      string      `json:"auto_renewal"`
-			AutoFillRecvcode string      `json:"auto_fill_recvcode"`
+			AutoRenewal      StringInt64 `json:"auto_renewal"`
+			AutoFillRecvcode StringInt64 `json:"auto_fill_recvcode"`
 			CanReport        int         `json:"can_report"`
 			CanNotice        int         `json:"can_notice"`
 			HaveVioFile      int         `json:"have_vio_file"`
