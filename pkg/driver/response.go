@@ -356,7 +356,7 @@ type ShareSnapResp struct {
 			ForbidReason     string      `json:"forbid_reason"`
 			CreateTime       StringInt64 `json:"create_time"`
 			ReceiveCode      string      `json:"receive_code"`
-			ReceiveCount     string      `json:"receive_count"`
+			ReceiveCount     StringInt64 `json:"receive_count"`
 			ExpireTime       int64       `json:"expire_time"`
 			FileCategory     int64       `json:"file_category"`
 			AutoRenewal      string      `json:"auto_renewal"`
