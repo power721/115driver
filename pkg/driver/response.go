@@ -389,6 +389,7 @@ type ShareFile struct {
 	UpdateTime string       `json:"t"`
 	IsFile     int          `json:"fc"`
 	ParentID   string       `json:"pid"`
+	Duration   int          `json:"play_long"`
 	// Ns         string       `json:"ns"`
 	// D          int          `json:"d"`
 	// C          int          `json:"c"`
