@@ -2,11 +2,11 @@
 
 A comprehensive Go library, CLI tool, and MCP server for [115 cloud storage](https://115.com). It provides a full-featured driver for 115.com's API, supporting login, file operations, upload/download, offline downloads, and more.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/SheltonZhu/115driver)](https://goreportcard.com/report/github.com/SheltonZhu/115driver)
-[![Release](https://img.shields.io/github/release/SheltonZhu/115driver)](https://github.com/SheltonZhu/115driver/releases)
-[![Go Reference](https://pkg.go.dev/badge/github.com/SheltonZhu/115driver/v4.svg)](https://pkg.go.dev/github.com/SheltonZhu/115driver)
+[![Go Report Card](https://goreportcard.com/badge/github.com/power721/115driver)](https://goreportcard.com/report/github.com/power721/115driver)
+[![Release](https://img.shields.io/github/release/power721/115driver)](https://github.com/power721/115driver/releases)
+[![Go Reference](https://pkg.go.dev/badge/github.com/power721/115driver/v4.svg)](https://pkg.go.dev/github.com/power721/115driver)
 [![Go Version](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go)](https://go.dev/)
-[![License](https://img.shields.io/:License-MIT-orange.svg)](https://raw.githubusercontent.com/SheltonZhu/115driver/main/LICENSE)
+[![License](https://img.shields.io/:License-MIT-orange.svg)](https://raw.githubusercontent.com/power721/115driver/main/LICENSE)
 
 ## Table of Contents
 
@@ -40,7 +40,7 @@ A comprehensive Go library, CLI tool, and MCP server for [115 cloud storage](htt
 ## Installation
 
 ```bash
-go get github.com/SheltonZhu/115driver
+go get github.com/power721/115driver
 ```
 
 ## Quick Start
@@ -51,7 +51,7 @@ go get github.com/SheltonZhu/115driver
 package main
 
 import (
-    "github.com/SheltonZhu/115driver/pkg/driver"
+    "github.com/power721/115driver/pkg/driver"
     "log"
 )
 
@@ -142,7 +142,7 @@ taskIDs, err := client.AddOfflineTaskURIs(
 ### Install
 
 ```bash
-go install github.com/SheltonZhu/115driver/cmd/115driver@latest
+go install github.com/power721/115driver/cmd/115driver@latest
 ```
 
 ### Authentication
@@ -242,13 +242,13 @@ echo 'source <(115driver completion zsh)' >> ~/.zshrc
 **Option 1: go install**
 
 ```bash
-go install github.com/SheltonZhu/115driver/mcp@latest
+go install github.com/power721/115driver/mcp@latest
 ```
 
 **Option 2: build from source**
 
 ```bash
-git clone https://github.com/SheltonZhu/115driver.git
+git clone https://github.com/power721/115driver.git
 cd 115driver
 go build -o 115driver-mcp-server ./mcp/
 ```
@@ -292,7 +292,7 @@ Add to your `claude_desktop_config.json`:
 
 ## API Reference
 
-For detailed API documentation, visit [pkg.go.dev](https://pkg.go.dev/github.com/SheltonZhu/115driver).
+For detailed API documentation, visit [pkg.go.dev](https://pkg.go.dev/github.com/power721/115driver).
 
 ## Troubleshooting
 

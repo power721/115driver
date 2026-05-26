@@ -10,7 +10,7 @@ MCP_MAIN ?= ./mcp
 CLI_BIN ?= $(BIN_DIR)/115driver
 MCP_BIN ?= $(BIN_DIR)/115driver-mcp-server
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
-CLI_LDFLAGS ?= -s -w -X github.com/SheltonZhu/115driver/cli/cmd.version=$(VERSION)
+CLI_LDFLAGS ?= -s -w -X github.com/power721/115driver/cli/cmd.version=$(VERSION)
 
 .DEFAULT_GOAL := help
 
