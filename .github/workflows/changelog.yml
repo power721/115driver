@@ -9,8 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  releaser:
-    name: release
+  goreleaser:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,25 +18,18 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
-          cache: false
+          go-version: stable
 
-      - name: Get Tag Name
-        id: tag
-        run: echo "tagName=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Generate release notes
+        run: go run ./cmd/release-notes -tag "${GITHUB_REF_NAME}" > .release-notes.md
 
-      - name: Generate Changelog
-        id: gen_changelog
-        run: |
-          config=./.chglog/config.yml
-          tagName=v${{ steps.tag.outputs.tagName }}
-          go run github.com/git-chglog/git-chglog/cmd/git-chglog@latest --config $config $tagName
-          go run github.com/git-chglog/git-chglog/cmd/git-chglog@latest --config $config $tagName > changelog.md
-
-      - name: Create Release
-        uses: ncipollo/release-action@v1
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          bodyFile: changelog.md
-          token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean --release-notes=.release-notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

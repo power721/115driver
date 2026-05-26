@@ -17,7 +17,7 @@ func UA(userAgent ...string) Option {
 		if len(userAgent) > 0 {
 			c.SetUserAgent(userAgent[0])
 		} else {
-			c.SetUserAgent(UADefalut)
+			c.SetUserAgent(UADefault)
 		}
 	}
 }
@@ -162,7 +162,12 @@ type UploadMultipartOptions struct {
 	TokenRefreshTime time.Duration
 }
 
+// DefalutUploadMultipartOptions is deprecated: use DefaultUploadMultipartOptions instead. This function exists for backward compatibility.
 func DefalutUploadMultipartOptions() *UploadMultipartOptions {
+	return DefaultUploadMultipartOptions()
+}
+
+func DefaultUploadMultipartOptions() *UploadMultipartOptions {
 	return &UploadMultipartOptions{
 		// oss 启用Sequential必须按顺序上传
 		ThreadsNum:       1,

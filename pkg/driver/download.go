@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	crypto "github.com/power721/115driver/pkg/crypto/m115"
@@ -75,7 +76,7 @@ func (c *Pan115Client) DownloadWithUA(pickCode, ua string) (*DownloadInfo, error
 		if info.FileSize < 0 {
 			return nil, ErrDownloadEmpty
 		}
-		info.Header = resp.Request.Header
+		info.Header = buildDownloadHeaders(resp.Request.Header, resp.Cookies())
 		return info, nil
 	}
 	return nil, ErrUnexpected
@@ -122,7 +123,7 @@ func (c *Pan115Client) DownloadWithUAByAndroidAPI(pickCode string, ua string) (*
 			Url: infoResp.URL,
 		},
 		PickCode: pickCode,
-		Header:   resp.Request.Header,
+		Header:   buildDownloadHeaders(resp.Request.Header, resp.Cookies()),
 	}
 
 	return &info, nil
@@ -133,59 +134,74 @@ func (c *Pan115Client) Download(pickCode string) (*DownloadInfo, error) {
 	return c.DownloadWithUA(pickCode, "")
 }
 
+func buildDownloadHeaders(requestHeaders http.Header, responseCookies []*http.Cookie) http.Header {
+	headers := requestHeaders.Clone()
+	if len(responseCookies) == 0 {
+		return headers
+	}
+
+	cookies := make([]string, 0, len(responseCookies)+1)
+	if existing := strings.TrimSpace(headers.Get("Cookie")); existing != "" {
+		cookies = append(cookies, existing)
+	}
+	for _, cookie := range responseCookies {
+		if cookie == nil {
+			continue
+		}
+		cookies = append(cookies, cookie.String())
+	}
+	if len(cookies) > 0 {
+		headers.Set("Cookie", strings.Join(cookies, "; "))
+	}
+	return headers
+}
+
 type SharedDownloadInfo struct {
 	FileID   string      `json:"fid"`
 	FileName string      `json:"fn"`
 	FileSize StringInt64 `json:"fs"`
 	URL      struct {
-		URL    string      `json:"url"`
-		Client int         `json:"client"`
-		Desc   interface{} `json:"desc"`
-		Isp    interface{} `json:"isp"`
+		URL    string `json:"url"`
+		Client int    `json:"client"`
+		Desc   any    `json:"desc"`
+		Isp    any    `json:"isp"`
+		OSSID  string `json:"oss_id"`
+		OOID   string `json:"ooid"`
 	} `json:"url"`
 }
 
 // DownloadByShareCode get download info with share code
 func (c *Pan115Client) DownloadByShareCode(shareCode, receiveCode, fileID string) (*SharedDownloadInfo, error) {
-	key := crypto.GenerateKey()
+	return c.DownloadByShareCodeWithUA("", shareCode, receiveCode, fileID)
+}
 
-	result := DownloadResp{}
-	params, err := json.Marshal(map[string]string{
+func (c *Pan115Client) DownloadByShareCodeWithUA(ua, shareCode, receiveCode, fileID string) (*SharedDownloadInfo, error) {
+	if isCalledByAlistV3() {
+		return nil, ErrorNotSupportAlist
+	}
+	result := DownloadShareResp{}
+	params := map[string]string{
 		"share_code":   shareCode,
 		"receive_code": receiveCode,
 		"file_id":      fileID,
-	})
-	if err != nil {
-		return nil, err
+		"dl":           "1",
 	}
 
-	data := crypto.Encode(params, key)
 	req := c.NewRequest().
-		SetQueryParam("t", Now().String()).
-		SetFormData(map[string]string{"data": data}).
+		SetQueryParams(params).
 		ForceContentType("application/json").
+		SetHeader("referer", BuildShareReferer(shareCode, receiveCode)).
 		SetResult(&result)
-	// if len(ua) > 0 {
-	// req = req.SetHeader("User-Agent", ua)
-	// }
-	resp, err := req.Post(ApiDownloadGetShareUrl)
+
+	if len(ua) > 0 {
+		req = req.SetHeader("User-Agent", ua)
+	}
+	resp, err := req.Get(ApiDownloadGetShareUrl)
 
 	if err := CheckErr(err, &result, resp); err != nil {
 		return nil, err
 	}
-	bytes, err := crypto.Decode(string(result.EncodedData), key)
-	if err != nil {
-		return nil, err
-	}
 
-	downloadInfo := SharedDownloadInfo{}
-	if err := json.Unmarshal(bytes, &downloadInfo); err != nil {
-		return nil, err
-	}
-
-	if downloadInfo.FileSize < 0 {
-		return nil, ErrDownloadEmpty
-	}
-
+	downloadInfo := result.Data
 	return &downloadInfo, nil
 }

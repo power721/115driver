@@ -373,7 +373,7 @@ func (c *Pan115Client) UploadByMultipart(params *UploadOSSParams, fileSize int64
 		err       error
 	)
 
-	options := DefalutUploadMultipartOptions()
+	options := DefaultUploadMultipartOptions()
 	if len(opts) > 0 {
 		for _, f := range opts {
 			f(options)

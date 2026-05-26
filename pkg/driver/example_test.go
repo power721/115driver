@@ -10,14 +10,14 @@ func ExamplePan115Client_ImportCredential() {
 	if err := cr.FromCookie("UID=xxx;CID=xxxx;SEID=xxx;KID=xxx;other=xxxx"); err != nil {
 		log.Fatalf("Import credentail error: %s", err)
 	}
-	client := Defalut().ImportCredential(cr)
+	client := Default().ImportCredential(cr)
 	if err := client.LoginCheck(); err != nil {
 		log.Fatalf("Login error: %s", err)
 	}
 }
 
 func ExamplePan115Client_Download() {
-	client := Defalut()
+	client := Default()
 
 	info, err := client.Download("pickcode")
 	if err != nil {
@@ -38,7 +38,7 @@ func ExamplePan115Client_Download() {
 }
 
 func ExamplePan115Client_UploadSHA1() {
-	client := Defalut()
+	client := Default()
 
 	file, err := os.Open("/path/to/file")
 	if err != nil {
@@ -59,7 +59,7 @@ func ExamplePan115Client_UploadSHA1() {
 }
 
 func ExamplePan115Client_UploadFastOrByOSS() {
-	client := Defalut()
+	client := Default()
 
 	file, err := os.Open("/path/to/file")
 	if err != nil {
@@ -73,7 +73,7 @@ func ExamplePan115Client_UploadFastOrByOSS() {
 }
 
 func ExamplePan115Client_List() {
-	client := Defalut()
+	client := Default()
 
 	files, err := client.List("dirID")
 	if err != nil {
@@ -86,7 +86,7 @@ func ExamplePan115Client_List() {
 }
 
 func ExamplePan115Client_Move() {
-	client := Defalut()
+	client := Default()
 
 	err := client.Move("dirID", "fileID")
 	if err != nil {
@@ -95,7 +95,7 @@ func ExamplePan115Client_Move() {
 }
 
 func ExamplePan115Client_Copy() {
-	client := Defalut()
+	client := Default()
 
 	err := client.Copy("dirID", "fileID")
 	if err != nil {
@@ -104,7 +104,7 @@ func ExamplePan115Client_Copy() {
 }
 
 func ExamplePan115Client_Delete() {
-	client := Defalut()
+	client := Default()
 
 	err := client.Delete("fileID")
 	if err != nil {
@@ -113,7 +113,7 @@ func ExamplePan115Client_Delete() {
 }
 
 func ExamplePan115Client_Rename() {
-	client := Defalut()
+	client := Default()
 
 	err := client.Rename("fileID", "newname")
 	if err != nil {
@@ -122,11 +122,38 @@ func ExamplePan115Client_Rename() {
 }
 
 func ExamplePan115Client_Mkdir() {
-	client := Defalut()
+	client := Default()
 
 	cid, err := client.Mkdir("parentID", "name")
 	if err != nil {
 		log.Fatalf("Make directory error: %s", err)
 	}
 	log.Printf("cid is  %s", cid)
+}
+
+func ExamplePan115Client_Search() {
+	client := Default()
+
+	opts := &SearchOption{
+		SearchValue: "2025",
+		Offset:      0,
+		Limit:       30,
+		Type:        0,           // All types
+		Asc:         1,           // Ascending order
+		Order:       "file_name", // Sort by filename
+	}
+	result, err := client.Search(opts)
+	if err != nil {
+		log.Fatalf("Search error: %s", err)
+	}
+
+	log.Printf("Found %d files\n", result.Count)
+
+	for _, file := range result.Files {
+		if file.IsDirectory {
+			log.Printf("Directory: %s", file.Name)
+		} else {
+			log.Printf("File: %s (%d bytes)", file.Name, file.Size)
+		}
+	}
 }

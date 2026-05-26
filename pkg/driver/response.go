@@ -104,6 +104,8 @@ type FileInfo struct {
 
 	CreateTime StringInt64 `json:"tp"`
 	UpdateTime string      `json:"t"`
+
+	ThumbURL string `json:"u"`
 }
 
 type LabelInfo struct {
@@ -360,10 +362,12 @@ type ShareSnapResp struct {
 			ExpireTime       int64       `json:"expire_time"`
 			FileCategory     int64       `json:"file_category"`
 			AutoRenewal      StringInt64 `json:"auto_renewal"`
+			ShareDuration    int         `json:"share_duration"`
 			AutoFillRecvcode StringInt64 `json:"auto_fill_recvcode"`
 			CanReport        int         `json:"can_report"`
 			CanNotice        int         `json:"can_notice"`
 			HaveVioFile      int         `json:"have_vio_file"`
+			SkipLoginState   StringInt64 `json:"skip_login_state"`
 		} `json:"shareinfo"`
 		Count      int         `json:"count"`
 		List       []ShareFile `json:"list"`
@@ -394,7 +398,13 @@ type ShareFile struct {
 	// D          int          `json:"d"`
 	// C          int          `json:"c"`
 	// E          string       `json:"e"`
-	// U          string       `json:"u"`
+	// Ns          string       `json:"ns"`
+	// D           int          `json:"d"`
+	// C           int          `json:"c"`
+	// E           string       `json:"e"`
+	// Ms          int          `json:"ms"`
+	IsSkipLogin int    `json:"is_skip_login"`
+	ThumbURL    string `json:"u"`
 }
 
 type UploadResult struct {
@@ -415,4 +425,9 @@ type APIGetDirIDResp struct {
 	BasicResp
 	CategoryID IntString `json:"id"`
 	IsPrivate  IntString `json:"is_private"`
+}
+
+type DownloadShareResp struct {
+	BasicResp
+	Data SharedDownloadInfo `json:"data"`
 }

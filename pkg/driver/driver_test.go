@@ -197,11 +197,19 @@ func TestDownload(t *testing.T) {
 	assert.ErrorIs(t, err, ErrPickCodeIsEmpty)
 }
 
+func TestShareSnap(t *testing.T) {
+	down := teardown(t)
+	defer down(t)
+
+	_, err := client.GetShareSnapWithUA(UADefault, "sw6pw793wfp", "w816", "")
+	assert.ErrorIs(t, err, ErrSharedNotFound)
+}
+
 func TestDownloadByShareCode(t *testing.T) {
 	down := teardown(t)
 	defer down(t)
 
-	_, err := client.DownloadByShareCode("ssw60op83nuc", "y909", "2722742594004297631")
+	_, err := client.DownloadByShareCode("sw6pw793wfp", "w816", "2628478209787264315")
 	assert.ErrorIs(t, err, ErrSharedNotFound)
 }
 
@@ -410,14 +418,6 @@ LOOP:
 	}
 }
 
-func TestShareSnap(t *testing.T) {
-	down := teardown(t)
-	defer down(t)
-
-	_, err := client.GetShareSnap("ssw60op83nuc", "test", "")
-	assert.ErrorIs(t, err, ErrSharedNotFound)
-}
-
 func TestGetVersion(t *testing.T) {
 	down := teardown(t)
 	defer down(t)
@@ -434,4 +434,37 @@ func TestGetInfo(t *testing.T) {
 	info, err := client.GetInfo()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, info.SpaceInfo)
+}
+
+func TestSearch(t *testing.T) {
+	down := teardown(t)
+	defer down(t)
+
+	// Test basic search with empty keyword (should return some results)
+	result, err := client.Search(&SearchOption{
+		SearchValue: "2025",
+		Offset:      0,
+		Limit:       10,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+
+	// Test search with specific keyword
+	result, err = client.Search(&SearchOption{
+		SearchValue: "test",
+		Offset:      0,
+		Limit:       10,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+
+	// Test search with file type filter (e.g., images)
+	result, err = client.Search(&SearchOption{
+		SearchValue: "",
+		Type:        3, // Images
+		Offset:      0,
+		Limit:       10,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
 }

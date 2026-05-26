@@ -29,9 +29,14 @@ func New(opts ...Option) *Pan115Client {
 	return c
 }
 
-// Defalut creates an Client with default settings.
-func Defalut() *Pan115Client {
+// Default creates an Client with default settings.
+func Default() *Pan115Client {
 	return New(UA())
+}
+
+// Defalut is deprecated: use Default instead. This function exists for backward compatibility.
+func Defalut() *Pan115Client {
+	return Default()
 }
 
 func (c *Pan115Client) SetHttpClient(httpClient *http.Client) *Pan115Client {

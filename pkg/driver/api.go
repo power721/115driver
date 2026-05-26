@@ -26,13 +26,14 @@ const (
 
 	ApiFileStat = "https://webapi.115.com/category/get"
 	ApiFileInfo = "https://webapi.115.com/files/get_info"
+	ApiFileSearch = "https://webapi.115.com/files/search"
 
 	// share
-	ApiShareSnap = "https://webapi.115.com/share/snap"
+	ApiShareSnap = "https://115cdn.com/webapi/share/snap"
 
 	// download
 	ApiDownloadGetUrl        = "https://proapi.115.com/app/chrome/downurl"
-	ApiDownloadGetShareUrl   = "https://proapi.115.com/app/share/downurl"
+	ApiDownloadGetShareUrl   = "https://115cdn.com/webapi/share/downurl"
 	AndroidApiDownloadGetUrl = "https://proapi.115.com/android/2.0/ufile/download"
 
 	// offline download
