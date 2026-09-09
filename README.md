@@ -441,6 +441,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
             <br />
             <sub><b>Ovear</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/SwenChan">
+            <img src="https://avatars.githubusercontent.com/u/8899070?v=4" width="100;" alt="SwenChan"/>
+            <br />
+            <sub><b>SwenChan</b></sub>
+        </a>
     </td></tr>
 </table>
 <!-- readme: contributors -end -->
