@@ -159,12 +159,8 @@ type ResultWithErr interface {
 
 func CheckErr(err error, result ResultWithErr, restyResp *resty.Response) error {
 	if err == nil {
-		var data map[string]interface{}
-		_ = json.Unmarshal([]byte(restyResp.String()), &data)
-		if value, exists := data["error"]; exists {
-			if len(value.(string)) > 0 {
-				err = errors.New(value.(string))
-			}
+		if msg := apiErrorString(restyResp.String()); msg != "" {
+			err = errors.New(msg)
 		} else {
 			err = result.Err(restyResp.String())
 		}
@@ -173,4 +169,17 @@ func CheckErr(err error, result ResultWithErr, restyResp *resty.Response) error 
 		return err
 	}
 	return nil
+}
+
+// apiErrorString reports failures that some 115 endpoints return as a
+// top-level string "error" field instead of the usual state/errno fields.
+func apiErrorString(body string) string {
+	var data map[string]interface{}
+	if json.Unmarshal([]byte(body), &data) != nil {
+		return ""
+	}
+	if msg, ok := data["error"].(string); ok {
+		return msg
+	}
+	return ""
 }

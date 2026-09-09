@@ -382,29 +382,20 @@ type ShareSnapResp struct {
 }
 
 type ShareFile struct {
-	FileID     string       `json:"fid"`
-	UID        int          `json:"uid"`
-	CategoryID IntString    `json:"cid"`
-	FileName   string       `json:"n"`
-	Type       string       `json:"ico"`
-	Sha1       string       `json:"sha"`
-	Size       StringInt64  `json:"s"`
-	Labels     []*LabelInfo `json:"fl"`
-	UpdateTime string       `json:"t"`
-	IsFile     int          `json:"fc"`
-	ParentID   string       `json:"pid"`
-	Duration   int          `json:"play_long"`
-	// Ns         string       `json:"ns"`
-	// D          int          `json:"d"`
-	// C          int          `json:"c"`
-	// E          string       `json:"e"`
-	// Ns          string       `json:"ns"`
-	// D           int          `json:"d"`
-	// C           int          `json:"c"`
-	// E           string       `json:"e"`
-	// Ms          int          `json:"ms"`
-	IsSkipLogin int    `json:"is_skip_login"`
-	ThumbURL    string `json:"u"`
+	FileID      string       `json:"fid"`
+	UID         int          `json:"uid"`
+	CategoryID  IntString    `json:"cid"`
+	FileName    string       `json:"n"`
+	Type        string       `json:"ico"`
+	Sha1        string       `json:"sha"`
+	Size        StringInt64  `json:"s"`
+	Labels      []*LabelInfo `json:"fl"`
+	UpdateTime  string       `json:"t"`
+	IsFile      int          `json:"fc"`
+	ParentID    string       `json:"pid"`
+	Duration    int          `json:"play_long"`
+	IsSkipLogin int          `json:"is_skip_login"`
+	ThumbURL    string       `json:"u"`
 }
 
 type UploadResult struct {
