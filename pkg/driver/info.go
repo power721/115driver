@@ -30,7 +30,7 @@ type InfoResponse struct {
 type InfoData struct {
 	SpaceInfo        SpaceInfo        `json:"space_info"`
 	LoginDevicesInfo LoginDevicesInfo `json:"login_devices_info"`
-	ImeiInfo         bool             `json:"imei_info"`
+	ImeiInfo         json.RawMessage  `json:"imei_info"`
 }
 
 type TotalSize struct {

@@ -134,3 +134,36 @@ func SaveCredential(configPath, profile, cookie string) error {
 	}
 	return os.Chmod(path, 0600)
 }
+
+// ReadProfileConfig reads a config value from the specified profile section.
+// Returns empty string if the key is not set.
+func ReadProfileConfig(configPath, profile, key string) string {
+	path := configPath
+	if path == "" {
+		if envPath := os.Getenv(EnvConfig); envPath != "" {
+			path = envPath
+		} else {
+			home, _ := os.UserHomeDir()
+			path = filepath.Join(home, DefaultConfigDir, DefaultConfigFile)
+		}
+	}
+
+	v := viper.New()
+	v.SetConfigFile(path)
+	if err := v.ReadInConfig(); err != nil {
+		return ""
+	}
+
+	prof := profile
+	if prof == "" {
+		prof = ResolveProfile(profile)
+	}
+	if prof == "" {
+		prof = v.GetString("default_profile")
+	}
+	if prof == "" {
+		prof = DefaultProfile
+	}
+
+	return v.GetString("profiles." + prof + "." + key)
+}

@@ -1,6 +1,7 @@
 package accountinfo
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/power721/115driver/pkg/driver"
@@ -26,7 +27,7 @@ func TestFromDriverDataMapsAccountInfo(t *testing.T) {
 				{Device: "Browser", IsCurrent: 1},
 			},
 		},
-		ImeiInfo: true,
+		ImeiInfo: json.RawMessage("true"),
 	}
 
 	got := FromDriverData(user, info)
@@ -41,5 +42,5 @@ func TestFromDriverDataMapsAccountInfo(t *testing.T) {
 	assert.Equal(t, int64(750), got.Space.Used.Size)
 	assert.Equal(t, "127.0.0.1", got.LoginDevices.Last.IP)
 	assert.Len(t, got.LoginDevices.List, 1)
-	assert.True(t, got.ImeiInfo)
+	assert.Equal(t, json.RawMessage("true"), got.ImeiInfo)
 }

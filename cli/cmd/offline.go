@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/power721/115driver/cli/internal/auth"
 	"github.com/power721/115driver/cli/internal/output"
 	"github.com/power721/115driver/cli/internal/resolver"
 	"github.com/power721/115driver/pkg/driver"
@@ -24,12 +25,25 @@ var offlineAddCmd = &cobra.Command{
 		url := args[0]
 
 		saveDirID := resolver.RootID
+		saveDirName := ""
 		if offlineSaveDir != "" {
+			// -d flag takes priority
 			id, err := resolver.ResolveDir(client, offlineSaveDir)
 			if err != nil {
 				return &exitError{code: output.ExitNotFound, msg: fmt.Sprintf("Save directory not found: %s", offlineSaveDir)}
 			}
 			saveDirID = id
+			saveDirName = offlineSaveDir
+		} else {
+			// Try config default
+			if cfgDir := auth.ReadProfileConfig(configPath, profile, "default_offline_save_dir"); cfgDir != "" {
+				id, err := resolver.ResolveDir(client, cfgDir)
+				if err != nil {
+					return &exitError{code: output.ExitNotFound, msg: fmt.Sprintf("Save directory not found: %s (from config default_offline_save_dir)", cfgDir)}
+				}
+				saveDirID = id
+				saveDirName = cfgDir
+			}
 		}
 
 		hashes, err := client.AddOfflineTaskURIs([]string{url}, saveDirID)
@@ -40,7 +54,7 @@ var offlineAddCmd = &cobra.Command{
 		printer.PrintSuccess(map[string]interface{}{
 			"url":      url,
 			"hashes":   hashes,
-			"save_dir": offlineSaveDir,
+			"save_dir": saveDirName,
 		})
 		if !jsonOutput {
 			fmt.Printf("Offline task added: %s\n", url)

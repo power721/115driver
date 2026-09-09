@@ -15,6 +15,25 @@ type FileDownloadUrl struct {
 	Client float64 `json:"client"`
 	OSSID  string  `json:"oss_id"`
 	Url    string  `json:"url"`
+	Valid  bool    `json:"-"` // false when API returned false/null
+}
+
+// UnmarshalJSON handles both object and bool (false) responses from the API.
+func (f *FileDownloadUrl) UnmarshalJSON(b []byte) error {
+	// Handle false/null/empty cases
+	if len(b) == 0 || string(b) == "false" || string(b) == "null" {
+		*f = FileDownloadUrl{}
+		return nil
+	}
+	// Handle object case
+	type alias FileDownloadUrl
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	*f = FileDownloadUrl(a)
+	f.Valid = true
+	return nil
 }
 
 type DownloadInfo struct {
@@ -27,13 +46,21 @@ type DownloadInfo struct {
 
 // Get Download file from download info url
 func (info *DownloadInfo) Get() (io.ReadSeeker, error) {
-	req := resty.New().R().SetHeaderMultiValues(info.Header)
-	resp, err := req.Get(info.Url.Url)
+	req, err := http.NewRequest(http.MethodGet, info.Url.Url, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	return bytes.NewReader(resp.Body()), nil
+	req.Header = info.Header.Clone()
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(body), nil
 }
 
 type DownloadData map[string]*DownloadInfo
@@ -54,9 +81,7 @@ func (c *Pan115Client) DownloadWithUA(pickCode, ua string) (*DownloadInfo, error
 		SetFormData(map[string]string{"data": data}).
 		ForceContentType("application/json").
 		SetResult(&result)
-	if len(ua) > 0 {
-		req = req.SetHeader("User-Agent", ua)
-	}
+	req = req.SetHeader("User-Agent", ua)
 	resp, err := req.Post(ApiDownloadGetUrl)
 
 	if err := CheckErr(err, &result, resp); err != nil {
@@ -76,7 +101,7 @@ func (c *Pan115Client) DownloadWithUA(pickCode, ua string) (*DownloadInfo, error
 		if info.FileSize < 0 {
 			return nil, ErrDownloadEmpty
 		}
-		info.Header = buildDownloadHeaders(resp.Request.Header, resp.Cookies())
+		info.Header = buildDownloadHeaders(sentRequestHeaders(resp), resp.Cookies())
 		return info, nil
 	}
 	return nil, ErrUnexpected
@@ -98,9 +123,7 @@ func (c *Pan115Client) DownloadWithUAByAndroidAPI(pickCode string, ua string) (*
 		SetFormData(map[string]string{"data": data}).
 		ForceContentType("application/json").
 		SetResult(&result)
-	if len(ua) > 0 {
-		req = req.SetHeader("User-Agent", ua)
-	}
+	req = req.SetHeader("User-Agent", ua)
 	resp, err := req.Post(AndroidApiDownloadGetUrl)
 
 	if err := CheckErr(err, &result, resp); err != nil {
@@ -123,10 +146,23 @@ func (c *Pan115Client) DownloadWithUAByAndroidAPI(pickCode string, ua string) (*
 			Url: infoResp.URL,
 		},
 		PickCode: pickCode,
-		Header:   buildDownloadHeaders(resp.Request.Header, resp.Cookies()),
+		Header:   buildDownloadHeaders(sentRequestHeaders(resp), resp.Cookies()),
 	}
 
 	return &info, nil
+}
+
+// sentRequestHeaders returns the request headers that were actually sent on
+// the wire. resty keeps its own header map (exposed as resp.Request.Header)
+// separate from RawRequest.Header — a deep copy made by createHTTPRequest —
+// and the empty-UA sentinel is stripped from RawRequest only. Reading the
+// raw request headers here is the source of truth for what the peer
+// received, and matches the empty-UA handling in applyEmptyUAHandling.
+func sentRequestHeaders(resp *resty.Response) http.Header {
+	if resp == nil || resp.Request == nil || resp.Request.RawRequest == nil {
+		return nil
+	}
+	return resp.Request.RawRequest.Header
 }
 
 // Download get download info with pickcode
@@ -135,6 +171,9 @@ func (c *Pan115Client) Download(pickCode string) (*DownloadInfo, error) {
 }
 
 func buildDownloadHeaders(requestHeaders http.Header, responseCookies []*http.Cookie) http.Header {
+	if requestHeaders == nil {
+		requestHeaders = http.Header{}
+	}
 	headers := requestHeaders.Clone()
 	if len(responseCookies) == 0 {
 		return headers
@@ -191,11 +230,9 @@ func (c *Pan115Client) DownloadByShareCodeWithUA(ua, shareCode, receiveCode, fil
 		SetQueryParams(params).
 		ForceContentType("application/json").
 		SetHeader("referer", BuildShareReferer(shareCode, receiveCode)).
+		SetHeader("User-Agent", ua).
 		SetResult(&result)
 
-	if len(ua) > 0 {
-		req = req.SetHeader("User-Agent", ua)
-	}
 	resp, err := req.Get(ApiDownloadGetShareUrl)
 
 	if err := CheckErr(err, &result, resp); err != nil {

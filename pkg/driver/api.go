@@ -8,7 +8,7 @@ const (
 	ApiUserInfo    = "https://my.115.com/?ct=ajax&ac=nav"
 	ApiStatusCheck = "https://my.115.com/?ct=guide&ac=status"
 	// dir
-	ApiDirAdd = "https://webapi.115.com/files/add"
+	ApiDirAdd      = "https://webapi.115.com/files/add"
 	ApiDirName2CID = "https://webapi.115.com/files/getid"
 
 	// file
@@ -18,14 +18,14 @@ const (
 	ApiFileRename    = "https://webapi.115.com/files/batch_rename"
 	ApiFileIndexInfo = "https://webapi.115.com/files/index_info"
 
-	ApiFileList       = "https://webapi.115.com/files"
-	ApiFileList1       = "http://web.api.115.com/files"
+	ApiFileList  = "https://webapi.115.com/files"
+	ApiFileList1 = "http://web.api.115.com/files"
 	// ApiFileList2       = "http://anxia.com/webapi/files"
 	// ApiFileList3       = "http://v.anxia.com/webapi/files"
 	ApiFileListByName = "https://aps.115.com/natsort/files.php"
 
-	ApiFileStat = "https://webapi.115.com/category/get"
-	ApiFileInfo = "https://webapi.115.com/files/get_info"
+	ApiFileStat   = "https://webapi.115.com/category/get"
+	ApiFileInfo   = "https://webapi.115.com/files/get_info"
 	ApiFileSearch = "https://webapi.115.com/files/search"
 
 	// share

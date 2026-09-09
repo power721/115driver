@@ -44,11 +44,9 @@ func (c *Pan115Client) GetShareSnapWithUA(ua, shareCode, receiveCode, dirID stri
 	req := c.NewRequest().
 		SetQueryParams(query).
 		SetHeader("referer", BuildShareReferer(shareCode, receiveCode)).
+		SetHeader("User-Agent", ua).
 		ForceContentType("application/json;charset=UTF-8").
 		SetResult(&result)
-	if ua != "" {
-		req.SetHeader("User-Agent", ua)
-	}
 	resp, err := req.Get(ApiShareSnap)
 	if err := CheckErr(err, &result, resp); err != nil {
 		return nil, err

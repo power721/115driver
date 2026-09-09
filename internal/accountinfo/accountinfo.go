@@ -1,12 +1,16 @@
 package accountinfo
 
-import "github.com/power721/115driver/pkg/driver"
+import (
+	"encoding/json"
+
+	"github.com/power721/115driver/pkg/driver"
+)
 
 type AccountInfo struct {
 	User         User                    `json:"user"`
 	Space        Space                   `json:"space"`
 	LoginDevices driver.LoginDevicesInfo `json:"login_devices"`
-	ImeiInfo     bool                    `json:"imei_info"`
+	ImeiInfo     json.RawMessage         `json:"imei_info"`
 }
 
 type User struct {
