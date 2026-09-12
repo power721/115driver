@@ -71,7 +71,7 @@ const shareUpdateOK = `{"state":true,"error":"","errno":0}`
 
 func TestCreateShareForm(t *testing.T) {
 	env := newShareTestEnv(t, shareSendOK, shareUpdateOK)
-	resp, err := env.client.CreateShare("3189661663297662199", false)
+	resp, err := env.client.CreateShare("3189661663297662199")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func TestCreateShareForm(t *testing.T) {
 	for key, want := range map[string]string{
 		"user_id":     "6338615",
 		"file_ids":    "3189661663297662199",
-		"ignore_warn": "0",
+		"ignore_warn": "1",
 		"order":       "file_name",
 	} {
 		if got := req.form.Get(key); got != want {
@@ -97,16 +97,6 @@ func TestCreateShareForm(t *testing.T) {
 	}
 	if resp.Data.ShareExDuration != "15天" {
 		t.Fatalf("default duration = %q, want 15天 (caller must extend to permanent)", resp.Data.ShareExDuration)
-	}
-}
-
-func TestCreateShareIgnoreWarn(t *testing.T) {
-	env := newShareTestEnv(t, shareSendOK, shareUpdateOK)
-	if _, err := env.client.CreateShare("123", true); err != nil {
-		t.Fatal(err)
-	}
-	if got := env.request[0].form.Get("ignore_warn"); got != "1" {
-		t.Fatalf("ignore_warn = %q, want 1", got)
 	}
 }
 
@@ -140,7 +130,7 @@ func TestCreatePermanentShareTwoSteps(t *testing.T) {
 func TestCreateShareRequiresUserID(t *testing.T) {
 	env := newShareTestEnv(t, shareSendOK, shareUpdateOK)
 	env.client.UserID = 0
-	_, err := env.client.CreateShare("123", true)
+	_, err := env.client.CreateShare("123")
 	if err == nil || !strings.Contains(err.Error(), "LoginCheck") {
 		t.Fatalf("err = %v, want LoginCheck required", err)
 	}
@@ -151,7 +141,7 @@ func TestCreateShareRequiresUserID(t *testing.T) {
 
 func TestCreateShareApiError(t *testing.T) {
 	env := newShareTestEnv(t, `{"state":false,"error":"分享次数已达上限","errno":990001}`, shareUpdateOK)
-	_, err := env.client.CreateShare("123", true)
+	_, err := env.client.CreateShare("123")
 	if err == nil || !strings.Contains(err.Error(), "分享次数已达上限") {
 		t.Fatalf("err = %v, want API error passthrough", err)
 	}

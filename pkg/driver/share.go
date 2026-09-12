@@ -87,28 +87,24 @@ type ShareSendResp struct {
 	} `json:"data"`
 }
 
-// CreateShare creates a share of fileIDs (comma separated file/directory ids).
-// ignore_warn=true skips the risk-warning pre-check and creates the share
-// directly (required for unattended flows). NOTE: a freshly created share only
-// lasts 15 days by default — call UpdateShareDuration(code, -1) for a
-// permanent one, or use CreatePermanentShare.
-func (c *Pan115Client) CreateShare(fileIDs string, ignoreWarn bool) (*ShareSendResp, error) {
+// CreateShare creates a share of fileIDs (comma separated file/directory ids),
+// always with ignore_warn=1 (skip the risk-warning pre-check and create
+// directly — this is an unattended-flow library). NOTE: a freshly created
+// share only lasts 15 days by default — call UpdateShareDuration(code, -1)
+// for a permanent one, or use CreatePermanentShare.
+func (c *Pan115Client) CreateShare(fileIDs string) (*ShareSendResp, error) {
 	if isCalledByAlistV3() {
 		return nil, ErrorNotSupportAlist
 	}
 	if c.UserID == 0 {
 		return nil, errors.New("user id unknown, LoginCheck required before creating share")
 	}
-	warn := "0"
-	if ignoreWarn {
-		warn = "1"
-	}
 	result := ShareSendResp{}
 	req := c.NewRequest().
 		SetFormData(map[string]string{
 			"user_id":     strconv.FormatInt(c.UserID, 10),
 			"file_ids":    fileIDs,
-			"ignore_warn": warn,
+			"ignore_warn": "1",
 			"is_asc":      "0",
 			"order":       "file_name",
 		}).
@@ -151,7 +147,7 @@ func (c *Pan115Client) UpdateShareDuration(shareCode string, duration int) error
 // permanent (share/send defaults to 15 days, updateshare -1 removes expiry).
 // Cookie-only web API: no open-platform equivalent exists.
 func (c *Pan115Client) CreatePermanentShare(fileIDs string) (*ShareSendResp, error) {
-	result, err := c.CreateShare(fileIDs, true)
+	result, err := c.CreateShare(fileIDs)
 	if err != nil {
 		return nil, err
 	}
