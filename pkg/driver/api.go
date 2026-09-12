@@ -29,7 +29,9 @@ const (
 	ApiFileSearch = "https://webapi.115.com/files/search"
 
 	// share
-	ApiShareSnap = "https://115cdn.com/webapi/share/snap"
+	ApiShareSnap   = "https://115cdn.com/webapi/share/snap"
+	ApiShareSend   = "https://webapi.115.com/share/send"
+	ApiShareUpdate = "https://webapi.115.com/share/updateshare"
 
 	// download
 	ApiDownloadGetUrl        = "https://proapi.115.com/app/chrome/downurl"
